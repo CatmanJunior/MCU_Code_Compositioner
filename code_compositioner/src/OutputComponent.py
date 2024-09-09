@@ -6,29 +6,27 @@ from Component import Component
 
 # OutputComponent abstract class inheriting from Component
 class OutputComponent(Component, ABC):
-    def __init__(self, name: str, pins: List[Pin]):
-        super().__init__(name, pins)
+    def __init__(self, name: str, pins: List[int]):
+        pin_names = [pin for pin in self.get_required_pin_names()]
+        #generate pins dynamically
+        gen_pin = []
+        for i in range(len(pin_names)):
+            gen_pin.append(Pin(pins[i], pin_names[i]))
+        super().__init__(name, gen_pin)
 
+    def generate_pre_setup_code(self) -> str:
+        return f"int {self.pins[0].name} = {self.pins[0].number};"  # Define the LED pin number
 
+    def generate_setup_code(self) -> str:
+        return f"pinMode({self.pins[0].name}, OUTPUT);"
+
+    def generate_loop_code(self) -> str:
+        return f"digitalWrite({self.pins[0].name}, HIGH);"
 
 class LED(OutputComponent):
-    def __init__(self, pins: List[Pin]):
-        super().__init__("LED", pins)
-    
-    def generate_setup_code(self) -> str:
-        return f"pinMode({self.pins[0].number}, OUTPUT);"
+    pin_names = ["LEDPIN"]
+    component_name = "LED"
 
-    def generate_loop_code(self) -> str:
-        return f"digitalWrite({self.pins[0].number}, HIGH);  // Turn on the LED"
-
-
-# Concrete Buzzer class
 class Buzzer(OutputComponent):
-    def __init__(self, pins: List[Pin]):
-        super().__init__("Buzzer", pins)
-
-    def generate_setup_code(self) -> str:
-        return f"pinMode({self.pins[0].number}, OUTPUT);"
-
-    def generate_loop_code(self) -> str:
-        return f"digitalWrite({self.pins[0].number}, HIGH);  // Activate the buzzer"
+    pin_names = ["BUZZERPIN"]
+    component_name = "Buzzer"

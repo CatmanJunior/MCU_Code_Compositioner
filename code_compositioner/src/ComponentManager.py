@@ -1,0 +1,41 @@
+from typing import Dict
+from InputComponent import *
+from OutputComponent import *
+from Component import *
+
+class ComponentManager:
+    def __init__(self):
+        input_components = InputComponent.__subclasses__()
+        output_components = OutputComponent.__subclasses__()
+
+        self.component_map : Dict[str, Component] = {}
+        for component in input_components:
+            self.component_map[component.component_name] = component
+        for component in output_components:
+            self.component_map[component.component_name] = component
+        
+        self.components = {}
+    
+    def add_component(self, component_name: str, pins: List[int]):
+        """Add a component to the list of components."""
+        # Check if the component name is unique
+        unique_name = False
+        i=1
+
+        while not unique_name:
+            if component_name + "_" + str(i) not in self.components.keys():
+                new_component_name = component_name + "_" + str(i)
+                unique_name = True
+            else:
+                i+=1              
+        print(f"Adding component {new_component_name} on pins {pins}")
+        # Create the component object and add it to the dictionary of components
+        component = self.component_map[component_name](component_name, pins)
+        self.components[new_component_name] = component
+        
+    def remove_component(self, component_name: str):
+        """Remove a component from the list of components."""
+        if component_name in self.components.keys():
+            del self.components[component_name]
+        else:
+            print(f"Component {component_name} not found.") 

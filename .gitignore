@@ -1,2 +1,7 @@
 /.mypy_cache
 /venv
+MCU_Code_Compositioner.code-workspace
+
+code_compositioner/src/__pycache__/*
+
+code_compositioner/src/__pycache__/InputComponent.cpython-312.pyc
