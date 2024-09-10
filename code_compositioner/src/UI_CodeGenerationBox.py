@@ -25,9 +25,6 @@ class CodeGenerationBox:
     def generate_code(self):
         """Generate Arduino code based on selected components."""
         program = ArduinoProgram(self.component_manager)
-        print(self.component_manager.components)
         code = program.generate_code()
         self.code_display.setPlainText(code)
-        print(code)
-        # QMessageBox.information(self, 'Code Generated', 'Code generated successfully.')
-        # self.parent.upload_handler.upload_code(code)
+        

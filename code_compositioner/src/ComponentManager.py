@@ -5,13 +5,13 @@ from Component import *
 
 class ComponentManager:
     def __init__(self):
-        input_components = InputComponent.__subclasses__()
-        output_components = OutputComponent.__subclasses__()
+        self.input_components_classes = InputComponent.__subclasses__()
+        self.output_components_classes = OutputComponent.__subclasses__()
 
         self.component_map : Dict[str, Component] = {}
-        for component in input_components:
+        for component in self.input_components_classes:
             self.component_map[component.component_name] = component
-        for component in output_components:
+        for component in self.output_components_classes:
             self.component_map[component.component_name] = component
         
         self.components = {}
@@ -39,3 +39,7 @@ class ComponentManager:
             del self.components[component_name]
         else:
             print(f"Component {component_name} not found.") 
+            
+
+    def get_components(self) -> List[Component]:
+        return self.components.values()

@@ -1,13 +1,16 @@
 from PyQt5.QtWidgets import QVBoxLayout, QLabel, QComboBox, QPushButton, QLineEdit, QListWidget, QMessageBox
 from Component import Component
-
+from ComponentManager import ComponentManager
 class ComponentBox:
     def __init__(self, parent, component_type):
         self.parent = parent
         self.component_type = component_type  # "input" or "output"
         self.components = []
-        self.component_manager = parent.componentManager  
-        componentlist = self.component_manager.component_map.keys()
+        self.component_manager : ComponentManager = parent.componentManager  
+        if self.component_type == "input":
+            componentlist = self.component_manager.input_components_classes
+        else:
+            componentlist = self.component_manager.output_components_classes
 
         self.layout = QVBoxLayout()
         self.layout.addWidget(QLabel(f'{self.component_type.capitalize()} Components:'))
@@ -16,7 +19,7 @@ class ComponentBox:
         self.component_label = QLabel(f'Select {self.component_type.capitalize()} Component:')
         self.component_select = QComboBox()
         for comp in componentlist:
-            self.component_select.addItem(comp)
+            self.component_select.addItem(comp.get_component_name())
         self.component_select.currentIndexChanged.connect(self.update_fields)
 
         self.layout.addWidget(self.component_label)

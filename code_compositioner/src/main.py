@@ -1,6 +1,5 @@
 import sys
 from PyQt5.QtWidgets import QApplication
-from Interface import ArduinoConfigurator
 from UI_MainInterface import MainInterface
 
 if __name__ == '__main__':
