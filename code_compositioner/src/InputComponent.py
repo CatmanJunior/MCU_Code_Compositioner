@@ -6,13 +6,8 @@ from Component import Component
 
 class InputComponent(Component, ABC):
     def __init__(self, name: str, pins: List[int]):
-        pin_names = [pin for pin in self.get_required_pin_names()]
-        #generate pins dynamically
-        gen_pin = []
-        for i in range(len(pin_names)):
-            gen_pin.append(Pin(pins[i], pin_names[i]))
-        super().__init__(name, gen_pin)
-    
+        super().__init__(name, pins)  
+        
     def generate_pre_setup_code(self) -> str:
         return f"int {self.pins[0].name} = {self.pins[0].number};"  # Define the LED pin number
     

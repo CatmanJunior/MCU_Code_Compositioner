@@ -5,9 +5,19 @@ from Pin import Pin
 
 # Base abstract Component class
 class Component(ABC):
-    def __init__(self, name: str, pins: List[Pin]):
+    pin_names : List[str] = []
+    component_name : str = "Unknown Component"
+    
+    def __init__(self, name: str, pins: List[int]):
         self.name = name
-        self.pins = pins
+        
+        pin_names = [pin for pin in self.get_required_pin_names()]
+        #generate pins dynamically
+        gen_pin = []
+        for i in range(len(pin_names)):
+            gen_pin.append(Pin(pins[i], pin_names[i]))
+
+        self.pins = gen_pin
 
     @abstractmethod
     def generate_pre_setup_code(self) -> str:
@@ -23,7 +33,7 @@ class Component(ABC):
     
     @classmethod
     def get_required_pins(cls) -> int:
-        return cls.pin_names.count  # LED requires 1 pin
+        return len(cls.pin_names)
     
     @classmethod
     def get_required_pin_names(cls) -> List[str]:

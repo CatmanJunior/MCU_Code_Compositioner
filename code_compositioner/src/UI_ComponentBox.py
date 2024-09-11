@@ -1,11 +1,13 @@
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QComboBox, QPushButton, QLineEdit, QListWidget, QMessageBox
+from PyQt5.QtWidgets import QVBoxLayout, QLabel, QComboBox, QPushButton, QLineEdit, QListWidget, QMessageBox, QWidget
 from Component import Component
 from ComponentManager import ComponentManager
+from UI_MainInterface import MainInterface
+
 class ComponentBox:
-    def __init__(self, parent, component_type):
+    def __init__(self, parent : MainInterface , component_type) -> None:
         self.parent = parent
         self.component_type = component_type  # "input" or "output"
-        self.components = []
+        self.components : list[Component] = []
         self.component_manager : ComponentManager = parent.componentManager  
         if self.component_type == "input":
             componentlist = self.component_manager.input_components_classes
@@ -42,15 +44,28 @@ class ComponentBox:
         # Add the layout to the parent's main layout
         parent.main_layout.addLayout(self.layout)
 
-    def update_fields(self):
+    def update_fields(self) -> None:
         """Update input fields based on the selected component."""
         # Clear existing input fields
         for i in reversed(range(self.pin_input_container.count())):
-            self.pin_input_container.itemAt(i).widget().deleteLater()
+            if (item := self.pin_input_container.itemAt(i)) is not None and (widget := item.widget()) is not None:
+                widget.deleteLater()
+
 
         # Get the selected component
-        component: Component = self.component_manager.component_map[self.component_select.currentText()]
+        component_class: Component = self.component_manager.get_component_class(self.component_select.currentText())
+        # Ensure the component_class is valid
+        if component_class is None:
+            QMessageBox.warning(self.parent, "Component Error", "Selected component class not found.")
+            return
 
+        if not issubclass(component_class, Component):
+            QMessageBox.warning(self.parent, "Component Error", "Selected class is not a valid Component subclass.")
+            return
+
+        # Instantiate the component class
+        component: Component = component_class("", [])
+        
         # Update fields based on the selected component
         for pin in component.get_required_pin_names():
             pin_label = QLabel(f"{pin}:")
@@ -59,17 +74,16 @@ class ComponentBox:
             self.pin_input_container.addWidget(pin_label)
             self.pin_input_container.addWidget(pin_input)
 
-    def add_component(self):
+    def add_component(self) -> None:
         """Add the selected component to the list."""
         # Get the selected component
         component_name = self.component_select.currentText()
-        component: Component = self.component_manager.component_map[component_name]
+        component_class: type[Component] = self.component_manager.component_map[component_name]
 
         # Gather pin inputs
         pin_numbers = []
         for i in range(self.pin_input_container.count()):
-            widget = self.pin_input_container.itemAt(i).widget()
-            if isinstance(widget, QLineEdit):
+            if (item := self.pin_input_container.itemAt(i)) is not None and (widget := item.widget()) is not None:
                 pin_number_str = widget.text()
                 if pin_number_str.isdigit():
                     pin_numbers.append(int(pin_number_str))
@@ -78,11 +92,13 @@ class ComponentBox:
                     return
 
         # Validate the pin count and add the component
-        required_pins = component.get_required_pin_names()
+        required_pins = component_class.get_required_pin_names()
+        component : Component = component_class(component_name, pin_numbers)
         if len(pin_numbers) == len(required_pins):
             self.components.append(component)
             self.component_list.addItem(f"{component_name} on pins {', '.join(map(str, pin_numbers))}")
             self.component_manager.add_component(component_name, pin_numbers)
+            self.parent.update_trigger_box()
         else:
             QMessageBox.warning(self.parent, "Input Error", f"{component_name} requires exactly {len(required_pins)} pin(s).")
 
