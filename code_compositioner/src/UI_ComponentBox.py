@@ -53,7 +53,7 @@ class ComponentBox:
 
 
         # Get the selected component
-        component_class: Component = self.component_manager.get_component_class(self.component_select.currentText())
+        component_class: type[Component] = self.component_manager.get_component_class(self.component_select.currentText())
         # Ensure the component_class is valid
         if component_class is None:
             QMessageBox.warning(self.parent, "Component Error", "Selected component class not found.")
@@ -63,11 +63,10 @@ class ComponentBox:
             QMessageBox.warning(self.parent, "Component Error", "Selected class is not a valid Component subclass.")
             return
 
-        # Instantiate the component class
-        component: Component = component_class("", [])
+        req_pins = component_class.get_required_pin_names()
         
         # Update fields based on the selected component
-        for pin in component.get_required_pin_names():
+        for pin in req_pins:
             pin_label = QLabel(f"{pin}:")
             pin_input = QLineEdit()
             pin_input.setPlaceholderText(f"Enter pin number for {pin}")
@@ -78,7 +77,7 @@ class ComponentBox:
         """Add the selected component to the list."""
         # Get the selected component
         component_name = self.component_select.currentText()
-        component_class: type[Component] = self.component_manager.component_map[component_name]
+        component_class = self.component_manager.get_component_class(component_name)
 
         # Gather pin inputs
         pin_numbers = []
@@ -93,7 +92,7 @@ class ComponentBox:
 
         # Validate the pin count and add the component
         required_pins = component_class.get_required_pin_names()
-        component : Component = component_class(component_name, pin_numbers)
+        component = component_class(component_name, pin_numbers)
         if len(pin_numbers) == len(required_pins):
             self.components.append(component)
             self.component_list.addItem(f"{component_name} on pins {', '.join(map(str, pin_numbers))}")

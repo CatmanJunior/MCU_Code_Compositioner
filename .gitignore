@@ -8,3 +8,5 @@ code_compositioner/src/__pycache__/*
 .vscode/settings.json
 code_compositioner/.mypy_cache/*
 code_compositioner/src/__pycache__/*
+code_compositioner/src/__pycache__/InputComponent.cpython-312.pyc
+code_compositioner/src/__pycache__/OutputComponent.cpython-312.pyc
