@@ -1,7 +1,10 @@
-/.mypy_cache
+/.mypy_cache/*
 /venv
 MCU_Code_Compositioner.code-workspace
 
 code_compositioner/src/__pycache__/*
 
 
+.vscode/settings.json
+code_compositioner/.mypy_cache/*
+code_compositioner/src/__pycache__/*
